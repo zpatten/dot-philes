@@ -1,0 +1,112 @@
+#
+# Uber Git/Ruby/RVM Bash Prompt
+# -Zachary Patten (zim931@gmail.com)
+#
+# PROMPT FORMAT:
+# ==============
+#(user@hostname)-(jobs/term/command_count/history_count)-(time/date)
+#<ruby@gemset>-<gem_version>-<git_branch/change_count>
+#[pwd] $ 
+#
+# EXAMPLE:
+# ========
+#(user@desktop)-(j0/t0/c45/h543)-(09:22:35/May-19-2011)
+#<ree-1.8.7-2011.03@development>-<1.4.2>-<master/0>
+#[~/projects/stuff] $ 
+#
+# USAGE:
+# ======
+# Execute from your '.bashrc' or '.bash_profile' or '.profile':
+#
+# . ~/.bash_prompt
+#
+
+
+parse_git_branch() {
+  local GBRANCH=$(git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/')
+  if [ -z "$GBRANCH" ]; then
+    echo -n "NaGR"
+  else
+    echo -n "$GBRANCH"
+  fi
+}
+
+parse_git_changed_files() {
+  git diff --numstat --no-color 2> /dev/null | wc -l
+}
+
+parse_git_changes() {
+  git diff --numstat --no-color 2> /dev/null
+}
+
+parse_rvm_current() {
+  local CRVM=$(rvm current 2> /dev/null)
+  if [ -z "$CRVM" ]; then
+    echo -n "NoRVM"
+  else
+    echo -n "$CRVM"
+  fi
+}
+
+parse_rubygem_version() {
+  local RGEM=$(gem -v 2> /dev/null)
+  if [ -z "$RGEM" ]; then
+    echo -n "NoGEM"
+  else
+    echo -n "$RGEM"
+  fi
+}
+
+build_prompt() {
+
+local NC="\[\033[0m\]"     # reset ANSI attributes
+
+# dim colors
+local K="\[\033[0;30m\]"   # black
+local R="\[\033[0;31m\]"   # red
+local G="\[\033[0;32m\]"   # green
+local Y="\[\033[0;33m\]"   # yellow
+local B="\[\033[0;34m\]"   # blue
+local M="\[\033[0;35m\]"   # magenta
+local C="\[\033[0;36m\]"   # cyan
+local W="\[\033[0;37m\]"   # white
+
+# bright colors
+local BK="\[\033[1;30m\]"  # grey
+local BR="\[\033[1;31m\]"  # red
+local BG="\[\033[1;32m\]"  # green
+local BY="\[\033[1;33m\]"  # yellow
+local BB="\[\033[1;34m\]"  # blue
+local BM="\[\033[1;35m\]"  # magenta
+local BC="\[\033[1;36m\]"  # cyan
+local BW="\[\033[1;37m\]"  # white
+
+# background colors
+local BGK="\[\033[40m\]"
+local BGR="\[\033[41m\]"
+local BGG="\[\033[42m\]"
+local BGY="\[\033[43m\]"
+local BGB="\[\033[44m\]"
+local BGM="\[\033[45m\]"
+local BGC="\[\033[46m\]"
+local BGW="\[\033[47m\]"
+
+
+case $TERM in
+    xterm*|rxvt*)
+        local TITLEBAR='\[\033]0;\u@\H:\w\007\]'
+        ;;
+    *)
+        local TITLEBAR=""
+        ;;
+esac
+
+PS1="$TITLEBAR\
+$B($BB\u$BK@$BB\H$B)$BK-$B($BB"j"\j$BK/$BB"t"\l$BK/$BB"c"\#$BK/$BB"h"\!$B)$BK-$B($BB\$(date +%H:%M:%S)$BK/$BB\$(date +%b-%d-%Y)$B)\n\
+$C<$BC\$(parse_rvm_current)$C>$BK-$C<$BC\$(parse_rubygem_version)$C>$BK-$C<$BC\$(parse_git_branch)$BK/$BC\$(parse_git_changed_files)$C>\n\
+$M[$BM\w$M]$NC $ "
+
+PS2="$BK--$NC "
+}
+
+build_prompt
