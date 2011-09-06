@@ -1,0 +1,10 @@
+[core]
+	excludesfile = ~/.gitignore
+[color]
+	ui = auto
+[user]
+	name = Zachary Patten
+	email = dev@null.priv
+[github]
+	user = zpatten
+  token = null
