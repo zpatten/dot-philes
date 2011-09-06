@@ -1,0 +1,4 @@
+.bundle
+.idea
+.rvmrc
+/vendor/bundle
